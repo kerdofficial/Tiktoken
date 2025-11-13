@@ -8,6 +8,7 @@ Supports vocab:
 - p50k_base
 - p50k_edit
 - cl100k_base (gpt-4 and gpt-3.5)
+- o200k_base (gpt-4o)
 
 And also supports asian characters and emojis.
 
