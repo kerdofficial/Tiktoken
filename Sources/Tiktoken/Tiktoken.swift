@@ -7,8 +7,23 @@ public struct Tiktoken {
     private init() {}
     
     public func getEncoding(_ name: String) async throws -> Encoding? {
-        guard let vocab = Model.getEncoding(name) else { return nil }
+        print("Looking up vocab for model: \(name)")
+        guard let vocab = Model.getEncoding(name) else {
+            print("No vocab found for model: \(name)")
+            return nil
+        }
+        print("Found vocab: \(vocab.name)")
+        print("Loading ranks from: \(vocab.url)")
+        
         let encoder = await loadRanks(vocab)
+        
+        if encoder.isEmpty {
+            print("Failed to load ranks - encoder is empty!")
+            return nil
+        }
+        
+        print("Loaded \(encoder.count) ranks")
+        
         let regex = try NSRegularExpression(pattern: vocab.pattern)
         let encoding = Encoding(name: name, regex: regex, mergeableRanks: encoder, specialTokens: vocab.specialTokens)
         return encoding

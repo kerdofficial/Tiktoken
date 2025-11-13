@@ -48,7 +48,7 @@ public extension Vocab {
         .init(name: "p50k_base",
               url: "https://openaipublic.blob.core.windows.net/encodings/p50k_base.tiktoken",
               explicitNVocab: 50281,
-              pattern: "/'s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| ?[^\\s\\p{L}\\p{N}]+|\\s+(?!\\S)|\\s+/gu",
+              pattern: "'(?:[sdmt]|ll|ve|re)| ?\\p{L}++| ?\\p{N}++| ?[^\\s\\p{L}\\p{N}]++|\\s++$|\\s+(?!\\S)|\\s",
               specialTokens: ["<|endoftext|>": 50256])
     }
     
@@ -67,7 +67,7 @@ public extension Vocab {
     static var cl100kBase: Vocab {
         .init(name: "cl100k_base",
               url: "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken",
-              pattern: "/(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\\r\\n\\p{L}\\p{N}]?\\p{L}+|\\p{N}{1,3}| ?[^\\s\\p{L}\\p{N}]+[\\r\\n]*|\\s*[\\r\\n]+|\\s+(?!\\S)|\\s+/gu",
+              pattern: "'(?i:[sdmt]|ll|ve|re)|[^\\r\\n\\p{L}\\p{N}]?+\\p{L}++|\\p{N}{1,3}+| ?[^\\s\\p{L}\\p{N}]++[\\r\\n]*+|\\s++$|\\s*[\\r\\n]|\\s+(?!\\S)|\\s",
               specialTokens: [
                 "<|endoftext|>": 100257,
                 "<|fim_prefix|>": 100258,
@@ -77,5 +77,15 @@ public extension Vocab {
               ])
     }
     
-    static var all: [Vocab] = [.gpt2, .r50kBase, .p50kBase, .p50kEdit, .cl100kBase]
+    static var o200kBase: Vocab {
+        .init(name: "o200k_base",
+              url: "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken",
+              pattern: "[^\\r\\n\\p{L}\\p{N}]?[\\p{Lu}\\p{Lt}\\p{Lm}\\p{Lo}\\p{M}]*[\\p{Ll}\\p{Lm}\\p{Lo}\\p{M}]+(?i:'s|'t|'re|'ve|'m|'ll|'d)?|[^\\r\\n\\p{L}\\p{N}]?[\\p{Lu}\\p{Lt}\\p{Lm}\\p{Lo}\\p{M}]+[\\p{Ll}\\p{Lm}\\p{Lo}\\p{M}]*(?i:'s|'t|'re|'ve|'m|'ll|'d)?|\\p{N}{1,3}| ?[^\\s\\p{L}\\p{N}]+[\\r\\n/]*|\\s*[\\r\\n]+|\\s+(?!\\S)|\\s+",
+              specialTokens: [
+                "<|endoftext|>": 199999,
+                "<|endofprompt|>": 200018
+              ])
+    }
+    
+    static var all: [Vocab] = [.gpt2, .r50kBase, .p50kBase, .p50kEdit, .cl100kBase, .o200kBase]
 }

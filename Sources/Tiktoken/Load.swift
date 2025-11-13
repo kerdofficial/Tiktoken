@@ -10,8 +10,14 @@ import CryptoKit
 
 enum Load {
     static func loadTiktokenBpe(url: String, decoder: FileDecoder = FileDecoder()) async -> [[UInt8]: Int] {
-        guard let data = try? await Load.fetch(stringUrl: url) else { return [:] }
-        return decoder.decode(data)
+        print("Loading tiktoken BPE from: \(url)")
+        guard let data = try? await Load.fetch(stringUrl: url) else {
+            print("Error: Failed to fetch data from URL")
+            return [:]
+        }
+        let ranks = decoder.decode(data)
+        print("Successfully loaded \(ranks.count) ranks")
+        return ranks
     }
     
     static func dataGymToMergeableBpeRanks(vocabBpeFile: String, encoderJsonFile: String? = nil) async -> [[UInt8]: Int] {
@@ -90,20 +96,40 @@ private extension Load {
 
         // Check if the data exists in cache
         if FileManager.default.fileExists(atPath: cacheFileURL.path) {
+            print("Using cached vocab file: \(urlHash)")
             let data = try? Data(contentsOf: cacheFileURL)
             return data
         } else {
-            guard let url = URL(string: stringUrl) else { return nil }
-            let (data, _) = try await URLSession.shared.data(from: url)
-
-            // Save data to cache
-            do {
-                try data.write(to: cacheFileURL)
-            } catch {
-                print("Error while caching: \(error)")
+            print("Downloading vocab from: \(stringUrl)")
+            
+            guard let url = URL(string: stringUrl) else {
+                print("Invalid URL: \(stringUrl)")
+                return nil
             }
+            
+            do {
+                let (data, response) = try await URLSession.shared.data(from: url)
+                
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("HTTP Response: \(httpResponse.statusCode)")
+                }
+                
+                print("Downloaded \(data.count) bytes")
 
-            return data
+                // Save data to cache
+                do {
+                    try data.write(to: cacheFileURL)
+                    print("Cached to: \(cacheFileURL.path)")
+                } catch {
+                    print("Error while caching: \(error)")
+                }
+
+                return data
+            } catch {
+                print("Network error: \(error.localizedDescription)")
+                print("   Error details: \(error)")
+                throw error
+            }
         }
     }
     
